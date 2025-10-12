@@ -33,4 +33,9 @@ app.get("/", (req: Request, res: Response) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`📡 CORS enabled for: ${CLIENT_URL}`);
+  console.log(`🔗 MongoDB URI: ${process.env.MONGO_DB ? 'Set' : 'Not set'}`);
+}).on('error', (err: any) => {
+  console.error('❌ Server failed to start:', err.message);
+  process.exit(1);
 });
