@@ -14,7 +14,7 @@ npm run dev
 Frontend
 cd frontend
 npm install
-# set NEXT_PUBLIC_API_URL=http://localhost:4000 in .env.local (optional)
+# set NEXT_PUBLIC_API_URL=https://assignment-staywise-ph7g-git-main-aarohi-singhs-projects.vercel.app/ in .env.local (optional)
 npm run dev
 
 Deploy
