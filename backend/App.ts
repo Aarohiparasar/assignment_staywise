@@ -10,12 +10,12 @@ dotenv.config();
 
 const app: Application = express();
 
-const PORT: number = Number(process.env.PORT) || 3000;
+const PORT: number = Number(process.env.PORT) || 4000;
 const CLIENT_URL: string = process.env.CLIENT_URL || "http://localhost:3001";
 
 app.use(
   cors({
-    origin: CLIENT_URL,
+    origin: true, // Allow all origins temporarily
     credentials: true,
   })
 );
