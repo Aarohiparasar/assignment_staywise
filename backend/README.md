@@ -1,15 +1,8 @@
 StayWise Backend
 
-Setup
+Setup Locally
 
-1. Copy env sample and fill values:
-
-PORT=4000
-CLIENT_URL=http://localhost:3000
-MONGO_DB=mongodb://127.0.0.1:27017/staywise
-JWT_SECRET=supersecretchangeme
-
-2. Install & run
+1. Install & run
 
 npm install
 npm run dev
