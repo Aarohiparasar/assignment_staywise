@@ -2,43 +2,104 @@
 import { useState } from "react";
 import { AuthAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { Form, Input, Button, Typography, message, Card } from "antd";
+
+const { Title } = Typography;
+
+// Type for form values
+interface SignupFormValues {
+  userName: string;
+  emailId: string;
+  mobileNumber: string;
+  password: string;
+}
 
 export default function SignupPage() {
-  const [userName, setUserName] = useState("");
-  const [emailId, setEmailId] = useState("");
-  const [password, setPassword] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (!userName.trim() || !emailId.trim() || !password.trim() || !mobileNumber.trim()) {
-      setError("All fields are required");
-      return;
-    }
+  const onFinish = async (values: SignupFormValues) => {
+    setLoading(true);
     try {
-      await AuthAPI.signup({ userName, emailId, password, mobileNumber });
+      await AuthAPI.signup(values);
+      message.success("Account created successfully!");
       router.push("/login");
     } catch (err: any) {
-      setError(err.message || "Signup failed");
+      message.error(err?.message || "Signup failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="mx-auto max-w-md p-6">
-      <h1 className="text-2xl font-semibold mb-4">Sign Up</h1>
-      <form onSubmit={onSubmit} className="space-y-4">
-        <input className="w-full border rounded p-2" placeholder="Username" value={userName} onChange={e => setUserName(e.target.value)} />
-        <input className="w-full border rounded p-2" placeholder="Email" value={emailId} onChange={e => setEmailId(e.target.value)} />
-        <input className="w-full border rounded p-2" placeholder="Mobile Number" value={mobileNumber} onChange={e => setMobileNumber(e.target.value)} />
-        <input className="w-full border rounded p-2" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-        {error && <p className="text-red-600 text-sm">{error}</p>}
-        <button className="bg-black text-white px-4 py-2 rounded" type="submit">Create account</button>
-      </form>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
+      <Card
+        style={{ maxWidth: 450, width: "100%", borderRadius: 12}}
+        styles={{ body: { padding: 40 } }}
+        className="shadow-xl"
+      >
+        <Title level={2} className="text-center mb-6">
+          Sign Up
+        </Title>
+
+        <Form<SignupFormValues> layout="vertical" onFinish={onFinish}>
+          <Form.Item
+            label="Username"
+            name="userName"
+            rules={[{ required: true, message: "Please enter your username" }]}
+          >
+            <Input placeholder="Enter username" size="large" className="rounded-md" />
+          </Form.Item>
+
+          <Form.Item
+            label="Email"
+            name="emailId"
+            rules={[
+              { required: true, message: "Please enter your email" },
+              { type: "email", message: "Please enter a valid email" },
+            ]}
+          >
+            <Input placeholder="Enter email" size="large" className="rounded-md" />
+          </Form.Item>
+
+          <Form.Item
+            label="Mobile Number"
+            name="mobileNumber"
+            rules={[
+              { required: true, message: "Please enter your mobile number" },
+              {
+                pattern: /^[0-9]{10}$/,
+                message: "Mobile number must be 10 digits",
+              },
+            ]}
+          >
+            <Input placeholder="Enter mobile number" size="large" className="rounded-md" />
+          </Form.Item>
+
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              { required: true, message: "Please enter your password" },
+              { min: 6, message: "Password must be at least 6 characters" },
+            ]}
+          >
+            <Input.Password placeholder="Enter password" size="large" className="rounded-md" />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="w-full rounded-md"
+              size="large"
+              loading={loading}
+            >
+              Create Account
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
     </div>
   );
 }
-
-
