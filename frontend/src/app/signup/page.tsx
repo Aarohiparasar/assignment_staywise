@@ -2,11 +2,10 @@
 import { useState } from "react";
 import { AuthAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { Form, Input, Button, Typography, message, Card } from "antd";
+import { Form, Input, Button, Typography, Card, Alert } from "antd";
 
 const { Title } = Typography;
 
-// Type for form values
 interface SignupFormValues {
   userName: string;
   emailId: string;
@@ -16,16 +15,21 @@ interface SignupFormValues {
 
 export default function SignupPage() {
   const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null); 
   const router = useRouter();
 
   const onFinish = async (values: SignupFormValues) => {
     setLoading(true);
+    setApiError(null); 
     try {
-      await AuthAPI.signup(values);
-      message.success("Account created successfully!");
-      router.push("/login");
+      const res: any = await AuthAPI.signup(values);
+      if (res.status === "error") {
+        setApiError(res.error || "Signup failed"); 
+      } else {
+        router.push("/login");
+      }
     } catch (err: any) {
-      message.error(err?.message || "Signup failed");
+      setApiError(err?.message || "Signup failed");
     } finally {
       setLoading(false);
     }
@@ -33,11 +37,7 @@ export default function SignupPage() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
-      <Card
-        style={{ maxWidth: 450, width: "100%", borderRadius: 12}}
-        styles={{ body: { padding: 40 } }}
-        className="shadow-xl"
-      >
+      <Card style={{ maxWidth: 450, width: "100%", borderRadius: 12 }} className="shadow-xl">
         <Title level={2} className="text-center mb-6">
           Sign Up
         </Title>
@@ -67,10 +67,7 @@ export default function SignupPage() {
             name="mobileNumber"
             rules={[
               { required: true, message: "Please enter your mobile number" },
-              {
-                pattern: /^[0-9]{10}$/,
-                message: "Mobile number must be 10 digits",
-              },
+              { pattern: /^[0-9]{10}$/, message: "Mobile number must be 10 digits" },
             ]}
           >
             <Input placeholder="Enter mobile number" size="large" className="rounded-md" />
@@ -86,6 +83,8 @@ export default function SignupPage() {
           >
             <Input.Password placeholder="Enter password" size="large" className="rounded-md" />
           </Form.Item>
+
+          {apiError && <Alert type="error" message={apiError} className="mb-4" showIcon />}
 
           <Form.Item>
             <Button

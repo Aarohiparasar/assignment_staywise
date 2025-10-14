@@ -2,18 +2,16 @@
 import { useState } from "react";
 import { AuthAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { Form, Input, Button, Typography, message, Card, Spin } from "antd";
+import { Form, Input, Button, Typography, Card, Alert, Spin } from "antd";
 import { LoadingOutlined, UserOutlined, LockOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 
-// Type for form values
 interface LoginFormValues {
   email: string;
   password: string;
 }
 
-// Type for API response (message is optional)
 interface LoginResponse {
   token: string;
   id: string;
@@ -22,27 +20,31 @@ interface LoginResponse {
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
 
   const onFinish = async (values: LoginFormValues) => {
     setLoading(true);
+    setApiError(null);
     try {
-      // AuthAPI.login already returns { token, id, message? }
       const res: LoginResponse = await AuthAPI.login({
-        emailId: values.email.trim(), // send as username if backend expects it
+        emailId: values.email.trim(),
         password: values.password,
       });
 
-      if (typeof window !== "undefined") {
-        localStorage.setItem("token", res.token);
-        localStorage.setItem("userId", res.id);
+      if (res.token && res.id) {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", res.token);
+          localStorage.setItem("userId", res.id);
+        }
+        router.push("/");
       }
-
-      // Display backend message if available
-      message.success(res.message || "Login successful!");
-      router.push("/");
     } catch (err: any) {
-      message.error(err?.message || "Login failed");
+      if (err?.error) {
+        setApiError(err.error); 
+      } else {
+        setApiError(err?.message || "Login failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -65,10 +67,7 @@ export default function LoginPage() {
             name="email"
             rules={[
               { required: true, message: "Please enter your email" },
-              {
-                type: "email",
-                message: "Please enter a valid email address",
-              },
+              { type: "email", message: "Please enter a valid email" },
             ]}
           >
             <Input
@@ -94,6 +93,12 @@ export default function LoginPage() {
               className="rounded-md"
             />
           </Form.Item>
+
+          {apiError && (
+            <div className="mb-4">
+              <Alert type="error" message={apiError} showIcon />
+            </div>
+          )}
 
           <Form.Item>
             <Button
