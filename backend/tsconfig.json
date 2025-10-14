@@ -6,8 +6,18 @@
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   },
-  "include": ["**/*.ts"],
+  "include": [
+    "**/*.ts",
+    "App.ts",
+    "Controllers/**/*.ts",
+    "MODELS/**/*.ts",
+    "ROUTERS/**/*.ts",
+    "Middleware/**/*.ts",
+    "DB/**/*.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

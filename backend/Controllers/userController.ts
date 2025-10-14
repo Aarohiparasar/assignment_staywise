@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 // ================= SIGNUP =================
 const signUp = async (req: Request, res: Response): Promise<void> => {
   try {
+    console.log("Signup request body:", req.body);
     const { userName, emailId, password, mobileNumber, role } = req.body;
 
     if (!userName || !emailId || !password || !mobileNumber) {
@@ -52,14 +53,16 @@ const signUp = async (req: Request, res: Response): Promise<void> => {
 
 // ================= LOGIN =================
 const Login = async (req: Request, res: Response): Promise<Response> => {
-  try {
-    const { username, password } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({ message: "Username and password are required" });
+  try {
+    const { emailId, password } = req.body;
+
+    if (!emailId || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
     }
 
-    const user = await Users.findOne({ userName: username });
+    // Use emailId from the model
+    const user = await Users.findOne({ emailId: emailId });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -72,7 +75,7 @@ const Login = async (req: Request, res: Response): Promise<Response> => {
     }
 
     const token = jwt.sign(
-      { id: user._id, username: user.userName, role: user.role },
+      { id: user._id, email: user.emailId, role: user.role },
       process.env.JWT_SECRET || "defaultsecret",
       { expiresIn: "1h" }
     );
@@ -87,6 +90,7 @@ const Login = async (req: Request, res: Response): Promise<Response> => {
     return res.status(500).json({ message: "Unable to login due to some error" });
   }
 };
+
 
 // ================= PROFILE =================
 const Profile = async (req: Request, res: Response): Promise<Response> => {

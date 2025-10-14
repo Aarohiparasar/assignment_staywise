@@ -1,12 +1,14 @@
 import express from "express";
 import { createBooking, getAllBookings, getMyBookings } from "../Controllers/bookingController";
 import authMiddleware from "../Middleware/authRoute";
+import { cancelBooking } from "../Controllers/bookingController";
 
 const router = express.Router();
 
 // Authenticated users
 router.post("/", authMiddleware, createBooking);
 router.get("/me", authMiddleware, getMyBookings);
+router.delete("/:id", authMiddleware, cancelBooking);
 
 // Admin
 router.get("/", authMiddleware, (req, res, next) => {

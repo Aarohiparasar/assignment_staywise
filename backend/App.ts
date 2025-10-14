@@ -11,7 +11,7 @@ dotenv.config();
 const app: Application = express();
 
 const PORT: number = Number(process.env.PORT) || 4000;
-const CLIENT_URL: string = process.env.CLIENT_URL || "http://localhost:3001";
+const CLIENT_URL: string = process.env.CLIENT_URL || "http://localhost:3000";
 
 app.use(
   cors({

@@ -53,3 +53,30 @@ export const getAllBookings = async (_req: Request, res: Response): Promise<void
   res.json({ status: "success", data: bookings });
 };
 
+export const cancelBooking = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const bookingId = req.params.id;
+console.log(req.params.id,'bookingid---')
+    if (!bookingId) {
+      return res.status(400).json({ message: "Booking ID is required" });
+    }
+
+    // Find the booking first
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    // Optional: Only allow the user who booked to cancel
+    // if (booking.user.toString() !== req.user.id) {
+    //   return res.status(403).json({ message: "Not authorized to cancel this booking" });
+    // }
+
+    await booking.deleteOne(); // Delete the booking
+    return res.status(200).json({ message: "Booking cancelled successfully" });
+  } catch (error: any) {
+    console.error(error);
+    return res.status(500).json({ message: "Unable to cancel booking" });
+  }
+};
+
