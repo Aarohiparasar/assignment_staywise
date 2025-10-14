@@ -1,23 +1,20 @@
-StayWise (Full-Stack)
+StayWise – Fullstack Property Booking App
 
-Monorepo layout:
-- `/backend` – Express + Mongo + JWT
-- `/frontend` – Next.js (App Router) + Tailwind
+StayWise is a modern full-stack web application for exploring properties, making bookings, and managing reservations. Built with Next.js, React, Node.js, Express, MongoDB, and Tailwind CSS/Ant Design.
 
-Run locally
+Features
 
-Backend
-cd backend
-npm install
-npm run dev
+Explore, filter, and sort properties by location and price.
 
-Frontend
-cd frontend
-npm install
-npm run dev
+User authentication: signup/login.
 
-API Overview
-- Auth: `/api/users/signUp`, `/api/users/login`, `/api/users/profile/:id`
-- Properties: `/api/properties`, `/api/properties/:id` (POST `/api/properties` admin)
-- Bookings: POST `/api/bookings`, GET `/api/bookings/me`, GET `/api/bookings` (admin)
+View bookings in a dashboard.
 
+Responsive and interactive UI with smooth transitions.
+
+REST API with CRUD operations and JWT-based authentication.
+
+Tech Stack
+
+Frontend: Next.js, React, Ant Design, Tailwind CSS
+Backend: Node.js, Express, MongoDB, Mongoose, JWT
