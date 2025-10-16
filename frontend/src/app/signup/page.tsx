@@ -15,21 +15,32 @@ interface SignupFormValues {
 
 export default function SignupPage() {
   const [loading, setLoading] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null); 
+  const [apiError, setApiError] = useState<string | null>(null);
   const router = useRouter();
 
   const onFinish = async (values: SignupFormValues) => {
     setLoading(true);
-    setApiError(null); 
+    setApiError(null);
     try {
       const res: any = await AuthAPI.signup(values);
       if (res.status === "error") {
-        setApiError(res.error || "Signup failed"); 
+        setApiError(res.error || "Signup failed");
       } else {
         router.push("/login");
       }
     } catch (err: any) {
-      setApiError(err?.message || "Signup failed");
+       let message = "signUp failed";
+      try {
+        const parsed = JSON.parse(err.message);
+        message = parsed.error || message;
+      } catch {
+        message =
+          err?.response?.error ||
+          err?.error ||
+          "signUp failed. Please try again.";
+      }
+     // console.log(message)
+      setApiError(message || "Signup failed");
     } finally {
       setLoading(false);
     }

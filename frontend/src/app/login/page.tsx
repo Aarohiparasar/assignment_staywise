@@ -40,11 +40,21 @@ export default function LoginPage() {
         router.push("/");
       }
     } catch (err: any) {
-      if (err?.error) {
-        setApiError(err.error); 
-      } else {
-        setApiError(err?.message || "Login failed");
+      console.log(err, "=====");
+
+      // ✅ Extract only the message from API error
+      let message = "Login failed";
+      try {
+        const parsed = JSON.parse(err.message);
+        message = parsed.message || message;
+      } catch {
+        message =
+          err?.response?.message ||
+          err?.message ||
+          "Login failed. Please try again.";
       }
+
+      setApiError(message);
     } finally {
       setLoading(false);
     }

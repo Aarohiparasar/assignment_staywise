@@ -15,8 +15,18 @@ export default function MyBookingsPage() {
       try {
         const res = await BookingAPI.mine();
         setBookings(res.data);
-      } catch (e: any) {
-        setError(e.message || "Failed to load bookings");
+      } catch (err: any) {
+        let message = "Failed to load bookings";
+      try {
+        const parsed = JSON.parse(err.message);
+        message = parsed.error || message;
+      } catch {
+        message =
+          err?.response?.error ||
+          err?.error ||
+          "Failed to load bookings. Please try again.";
+      }
+        setError(message || "Failed to load bookings");
       } finally {
         setLoading(false);
       }

@@ -4,7 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
-import { HomeOutlined, BankOutlined, BookOutlined, LoginOutlined, UserAddOutlined } from "@ant-design/icons";
+import {
+  HomeOutlined,
+  BankOutlined,
+  BookOutlined,
+  LoginOutlined,
+  UserAddOutlined,
+  MenuOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,6 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navItems = [
     { label: "StayWise", href: "/", icon: <HomeOutlined /> },
@@ -46,7 +55,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
       >
-        <nav className="w-full border-b p-4 flex flex-wrap items-center gap-4">
+        {/* Navbar */}
+        <nav className="w-full border-b p-4 flex flex-wrap items-center gap-4 border-b-blue-600 relative">
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden text-blue-600 text-2xl mr-2"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle Menu"
+          >
+            {menuOpen ? <CloseOutlined /> : <MenuOutlined />}
+          </button>
+
           {/* StayWise logo/text */}
           <Link
             href="/"
@@ -56,26 +75,34 @@ export default function RootLayout({
             StayWise
           </Link>
 
-          {navItems.slice(1).map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-1 px-3 py-1 rounded transition-colors ${
-                isActive(item.href) ? "text-blue-600" : "text-gray-700 hover:text-blue-500"
-              }`}
-            >
-              {item.icon}
-              {item.label}
-            </Link>
-          ))}
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex flex-wrap items-center gap-4">
+            {navItems.slice(1).map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-1 px-3 py-1 rounded transition-colors text-blue-600 ${
+                  isActive(item.href)
+                    ? "text-blue-600"
+                    : "text-gray-700 hover:text-blue-500"
+                }`}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            ))}
+          </div>
 
-          <span className="ml-auto flex gap-3">
+          {/* Desktop Auth Links */}
+          <span className="hidden md:flex ml-auto gap-3">
             {authItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`flex items-center gap-1 px-3 py-1 rounded transition-colors ${
-                  isActive(item.href) ? "text-blue-600" : "text-gray-700 hover:text-blue-500"
+                  isActive(item.href)
+                    ? "text-blue-600"
+                    : "text-gray-700 hover:text-blue-500"
                 }`}
               >
                 {item.icon}
@@ -83,9 +110,50 @@ export default function RootLayout({
               </Link>
             ))}
           </span>
+
+          {/* Mobile Dropdown */}
+          {menuOpen && (
+            <div className="absolute top-full left-0 w-full bg-white shadow-lg border-t border-blue-100 flex flex-col items-start md:hidden z-50 animate-slideDown">
+              <div className="flex flex-col w-full p-3 space-y-2">
+                {[...navItems.slice(1), ...authItems].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md w-full ${
+                      isActive(item.href)
+                        ? "bg-blue-50 text-blue-600 font-semibold"
+                        : "text-gray-700 hover:bg-blue-50 hover:text-blue-500"
+                    }`}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </nav>
 
+        {/* Main content */}
         <main className="px-1 md:px-1 py-1">{children}</main>
+
+        {/* Animation */}
+        <style jsx global>{`
+          @keyframes slideDown {
+            from {
+              opacity: 0;
+              transform: translateY(-10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          .animate-slideDown {
+            animation: slideDown 0.3s ease forwards;
+          }
+        `}</style>
       </body>
     </html>
   );

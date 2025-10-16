@@ -14,14 +14,14 @@ export default function PropertiesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<string>("none");
-  const [filterLocation, setFilterLocation] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(""); // live input value
+  const [debouncedQuery, setDebouncedQuery] = useState<string>(""); // debounced value
 
   useEffect(() => {
     const loadProperties = async () => {
       try {
         const res = await PropertyAPI.list();
-        // simulate more data for scrollability
-        const expanded = [...res.data, ...res.data, ...res.data];
+        const expanded = [...res.data, ...res.data, ...res.data]; // simulate more data
         setProperties(expanded || []);
       } catch (err: any) {
         setError(err.message || "Failed to load properties");
@@ -33,13 +33,25 @@ export default function PropertiesPage() {
     loadProperties();
   }, []);
 
-  // Apply sorting and filtering
+  // Debounce searchQuery → updates debouncedQuery after 500ms delay
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  // Apply sorting and filtering (includes title + location)
   const filteredAndSorted = useMemo(() => {
     let result = [...properties];
 
-    if (filterLocation.trim()) {
-      result = result.filter((p) =>
-        p.location.toLowerCase().includes(filterLocation.toLowerCase())
+    if (debouncedQuery.trim()) {
+      const query = debouncedQuery.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.title.toLowerCase().includes(query) ||
+          p.location.toLowerCase().includes(query)
       );
     }
 
@@ -50,7 +62,7 @@ export default function PropertiesPage() {
     }
 
     return result;
-  }, [properties, sortOrder, filterLocation]);
+  }, [properties, sortOrder, debouncedQuery]);
 
   if (loading) {
     return (
@@ -87,9 +99,10 @@ export default function PropertiesPage() {
 
           <div className="flex flex-wrap items-center gap-3">
             <Input.Search
-              placeholder="Filter by location..."
-              onChange={(e) => setFilterLocation(e.target.value)}
-              className="w-52"
+              placeholder="Search by title or location..."
+              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchQuery}
+              className="w-60"
               allowClear
             />
             <Select
@@ -150,7 +163,6 @@ export default function PropertiesPage() {
                         <Text strong style={{ color: "#1677ff" }} className="flex items-center gap-1">
                           <DollarOutlined /> {p.pricePerNight}/night
                         </Text>
-
                       </div>
                     </div>
                   </Card>
